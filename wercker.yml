@@ -1,0 +1,60 @@
+box:
+  id: tomcat:7.0.92-jre7-alpine
+
+build:
+  steps:
+    - install-packages:
+        packages: maven
+
+    - script:
+        name: maven build
+        code: mvn clean package 
+
+    - script:
+        name: check
+        code: |
+            pwd
+            ls -l /pipeline/source/
+            ls -l /pipeline/source/target/
+            
+    - script:
+        name: deploy war to tomcat
+        code: |
+            pwd
+
+push-to-releases:
+  steps:
+    - internal/docker-push:
+        tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        ports: "8080"
+        cmd: catalina.sh run 
+        working-dir: /usr/local/tomcat 
+        username: $OKE_USERNAME
+        password: $OKE_PASSWORD
+        repository: $OKE_REPOSITORY/$WERCKER_APPLICATION_NAME
+        registry: $OKE_REGISTRY
+
+deploy-to-oke:
+  box:
+        id: alpine
+        cmd: /bin/sh
+  steps:
+    - bash-template
+    
+    - script:
+        name: "Visualise Kubernetes config"
+        code: cat kubernetes-deployment.yml
+
+    - kubectl:
+        name: delete deplyoment
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: delete -f $WERCKER_ROOT/kubernetes-deployment.yml --namespace=$APP_LOGIN_NAMESPACE --ignore-not-found=true
+
+    - kubectl:
+        name: create deplyoment
+        server: $KUBERNETES_MASTER
+        token: $KUBERNETES_TOKEN
+        insecure-skip-tls-verify: true
+        command: create -f $WERCKER_ROOT/kubernetes-deployment.yml --namespace=$APP_LOGIN_NAMESPACE
