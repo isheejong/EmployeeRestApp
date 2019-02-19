@@ -31,7 +31,7 @@ push-to-releases:
     - internal/docker-push:
         tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports: "8080"
-        cmd: .bin/catalina.sh run
+        cmd: bin/catalina.sh run
         working-dir: /pipeline/source/apache-tomcat-7.0.92/
         username: $OKE_USERNAME
         password: $OKE_PASSWORD
