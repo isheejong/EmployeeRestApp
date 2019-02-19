@@ -1,15 +1,25 @@
 box:
-  id: tomcat:7.0.92-jre7-alpine
+  id: openjdk:7-alpine 
 
 build:
   steps:
     - script:
         name: install maven
-        code: apk add maven
+        code: |
+            apk add maven
+            mvn -v
 
     - script:
         name: maven build
         code: mvn clean package 
+
+    - script:
+        name: install tomcat 7
+        code: |
+            wget https://www-eu.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
+            tar -zxf apache-tomcat-7.0.92.tar.gz
+            cd apache-tomcat-7.0.92
+            pwd
 
     - script:
         name: check
