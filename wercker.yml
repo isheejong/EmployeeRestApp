@@ -35,7 +35,7 @@ push-to-releases:
         working-dir: /pipeline/source/apache-tomcat-7.0.92/
         username: $OKE_USERNAME
         password: $OKE_PASSWORD
-        repository: $OKE_REPOSITORY/$WERCKER_APPLICATION_NAME
+        repository: $OKE_REPOSITORY
         registry: $OKE_REGISTRY
 
 deploy-to-oke:
