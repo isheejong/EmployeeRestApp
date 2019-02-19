@@ -19,27 +19,20 @@ build:
             wget https://www-eu.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
             tar -zxf apache-tomcat-7.0.92.tar.gz
             cd apache-tomcat-7.0.92
-            pwd
+            cp /pipeline/source/target/RestServiceMaven-1.0-SNAPSHOT.war webapps/EmployeeRestService.war
 
     - script:
         name: check
         code: |
-            pwd
             ls -l /pipeline/source/
-            ls -l /pipeline/source/target/
-            
-    - script:
-        name: deploy war to tomcat
-        code: |
-            pwd
 
 push-to-releases:
   steps:
     - internal/docker-push:
         tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports: "8080"
-        cmd: catalina.sh run 
-        working-dir: /usr/local/tomcat 
+        cmd: .bin/catalina.sh run
+        working-dir: /pipeline/source/apache-tomcat-7.0.92/
         username: $OKE_USERNAME
         password: $OKE_PASSWORD
         repository: $OKE_REPOSITORY/$WERCKER_APPLICATION_NAME
