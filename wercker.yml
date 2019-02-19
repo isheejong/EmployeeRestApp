@@ -1,5 +1,5 @@
 box:
-  id: openjdk:7-alpine 
+  id: openjdk:8-alpine 
 
 build:
   steps:
