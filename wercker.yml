@@ -3,8 +3,9 @@ box:
 
 build:
   steps:
-    - install-packages:
-        packages: maven
+    - script:
+        name: install maven
+        code: apk add maven
 
     - script:
         name: maven build
