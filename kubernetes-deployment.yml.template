@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: employee-rest-service
+  labels:
+    run: employee-rest-service
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: employee-rest-service
+    spec:
+      containers:
+      - image: $OKE_REPOSITORY:$WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+        imagePullPolicy: Always 
+        name: employee-rest-service 
+        ports:
+        - containerPort: 8080 
+          protocol: TCP
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: ocirsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-rest-service
+spec:
+    type: LoadBalancer
+    ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    selector:
+      run: employee-rest-service
