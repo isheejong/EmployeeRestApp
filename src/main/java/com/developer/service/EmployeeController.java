@@ -2,7 +2,13 @@
 
 package com.developer.service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -29,93 +35,56 @@ import com.developer.db.EmployeeDbDeclaration;
 import com.developer.entity.Employee;
 import com.developer.entity.EmployeeDeclaration;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 
 @Path("/employees")
 public class EmployeeController {
+	public static final List<Employee> rl = new ArrayList<>();
 
-    EmployeeDeclaration edao = new EmployeeDbDeclaration();
+	public EmployeeController() throws Exception {
+		if (rl.isEmpty()) {
+			this.readData();
+		}
+	}
+
+	public void writeData() throws IOException {
+		String json = new Gson().toJson(rl);
+
+		FileWriter fileWriter = new FileWriter("employee.json");
+		fileWriter.write(json);
+		fileWriter.close();
+	}
+
+	public void readData() throws Exception {
+		//BufferedReader br = new BufferedReader(new FileReader("WEB-INF\\employee.json"));
+
+		//String line = br.readLine();
+		String line = "[{\"id\":1,\"firstName\":\"Hugh\",\"lastName\":\"Jast\",\"email\":\"Hugh.Jast@example.com\",\"phone\":\"730-715-4446\",\"birthDate\":\"1970-11-28T08:28:48.078Z\",\"title\":\"National Data Strategist\",\"department\":\"Mobility\"}]";
+
+		//br.close();
+		Gson gson = new Gson();
+		Type collectionType = new TypeToken<Collection<Employee>>(){}.getType();
+		Collection<Employee> en = gson.fromJson(line, collectionType);
+		for (Employee e: en) {
+			//System.out.println(e);
+			rl.add(e);
+		}
+	}
+
+	public boolean add(Employee em) throws Exception {
+		rl.add(em);
+		//this.writeData();
+		return true;
+	}
 
     // Get all employees
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     //public Employee getAll() {
     public Employee[] getAll() {
-    	//System.out.println(edao.getAllEmployees().toString());
-        return edao.getAllEmployees().toArray(new Employee[0]);
-    	//Employee em = new Employee(1, "a", "b", "c", "d", "e", "f", "g");
-    	//return em;
-    }
-
-    // Get an employee
-    @GET
-    @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@PathParam("id") long id) {
-
-        Employee em = null;
-        em = edao.getEmployee(id);
-        
-        if (em != null) {
-            return Response.ok(em).build();
-        } else {
-            return Response.ok(null).build();
-        }
-    }
-
-    // Get employees by lastName 
-    @GET
-    @Path("/lastname/{name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getByLastName(@PathParam("name") String name) {
-
-        List<Employee> matchList = edao.getByLastName(name);
-
-        if (matchList.size() > 0) {
-            //return matchList.toArray(new Employee[0]);
-            //return Response.ok(matchList).build();
-            return Response.ok(matchList.toArray(new Employee[0])).build();
-        } else {
-            return Response.ok(null).build();
-        }
-    }
-
-    // Get employee by title
-    @GET
-    @Path("/title/{name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getByTitle(@PathParam("name") String name) {
-
-        List<Employee> matchList = edao.getByTitle(name);
-
-        if (matchList.size() > 0) {
-            return Response.ok(matchList.toArray(new Employee[0])).build();
-        } else {
-            return Response.ok(null).build();
-        }
-    }
-
-    // Get employee by dept
-    @GET
-    @Path("/department/{name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getByDept(@PathParam("name") String name) {
-
-        List<Employee> matchList = edao.getByDepartment(name);
-
-        if (matchList.size() > 0) {
-            return Response.ok(matchList.toArray(new Employee[0])).build();
-        } else {
-            return Response.ok(null).build();
-        }
-    }
-    
-    // test
-    @POST
-    @Path("test")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String testA(@QueryParam("name") String name) {
-    	System.out.println("test");
-    	return name;
+        return rl.toArray(new Employee[0]);
     }
 
     // Add an employee
@@ -124,7 +93,7 @@ public class EmployeeController {
     @Consumes("application/x-www-form-urlencoded")
     //@Consumes(MediaType.APPLICATION_JSON)
     //@Produces("text/plain")
-    public String add(MultivaluedMap<String, String> formParams) throws JsonParseException, JsonMappingException, IOException {
+    public String add(MultivaluedMap<String, String> formParams) throws Exception {
     	System.out.println("### add employee ###");
 
     	//Set<String> bodyContent = formParams.keySet();
@@ -145,60 +114,10 @@ public class EmployeeController {
     		System.out.println("value = " + value);
     	}*/
     	
-        if (edao.add(employee)) {
+        if (this.add(employee)) {
             return "success";
         } else {
             return "fail";
         }
     }
-    
-    // Update an employee
-    @PUT
-    @Path("update/{id}")
-    //@Produces(MediaType.APPLICATION_JSON)
-    @Consumes("application/x-www-form-urlencoded")
-    public String update(@PathParam("id") long id, MultivaluedMap<String, String> formParams) throws JsonParseException, JsonMappingException, IOException {
-    	System.out.println("### update employee ###");
-    	System.out.println("### update employee: " +id +" ###");
-    	String bodyContent = formParams.keySet().toString();
-    	bodyContent = bodyContent.substring(1, bodyContent.length()-1);
-    	System.out.println("update string: "+bodyContent);
-    	
-    	ObjectMapper mapper = new ObjectMapper();
-    	Employee employee = mapper.readValue(bodyContent, Employee.class);
-
-        if (edao.update(id, employee)) {
-            return "update success";
-        } else {
-            return "update fail";
-        }
-    }
-
-    // Delete a employee 
-    @DELETE
-    @Path("delete/{id}")
-    //@Consumes("application/x-www-form-urlencoded")
-    //@Produces(MediaType.APPLICATION_JSON)
-    public String delete(@PathParam("id") long id) {
-
-        boolean result = edao.delete(id);
-        System.out.println("### delete employee: " +id +" ###");
-        if (result) {
-            return "delete success";
-        } else {
-            return "delete fail";
-        }
-    }
-    /*@DELETE
-    @Path("delete")
-    @Consumes("application/json")
-    public String delete(MultivaluedMap<String, String> formParams) {
-    	System.out.println("### delete employee ###");
-    	
-    	String bodyContent = formParams.keySet().toString();
-    	//bodyContent = bodyContent.substring(1, bodyContent.length()-1);
-    	System.out.println("delete string: "+bodyContent);
-    	return "success";
-    	
-    }*/
 }
