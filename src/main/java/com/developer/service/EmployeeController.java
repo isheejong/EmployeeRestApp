@@ -31,7 +31,6 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.developer.db.EmployeeDbDeclaration;
 import com.developer.entity.Employee;
 import com.developer.entity.EmployeeDeclaration;
 
