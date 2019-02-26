@@ -41,6 +41,7 @@ import com.google.gson.reflect.TypeToken;
 @Path("/employees")
 public class EmployeeController {
 	public static final List<Employee> rl = new ArrayList<>();
+	public static int id_count = 1;
 
 	public EmployeeController() throws Exception {
 		if (rl.isEmpty()) {
@@ -73,9 +74,24 @@ public class EmployeeController {
 	}
 
 	public boolean add(Employee em) throws Exception {
+	        for (int i = 0; i < rl.size(); i += 1) {
+			if (rl.get(i).getId() == em.getId()) {
+				System.out.println("### employee id : " +em.getId() +" already exists ###");
+				return false;
+			}
+		}
 		rl.add(em);
-		//this.writeData();
 		return true;
+	}
+
+	public boolean deleteEm(long id) throws Exception {
+	        for (int i = 0; i < rl.size(); i += 1) {
+			if (rl.get(i).getId() == id) {
+				rl.remove(i);
+				return true;
+			}
+		}
+		return false;
 	}
 
     // Get all employees
@@ -104,6 +120,8 @@ public class EmployeeController {
     	
     	ObjectMapper mapper = new ObjectMapper();
     	Employee employee = mapper.readValue(bodyContent, Employee.class);
+	id_count = id_count + 1;
+	employee.setId(id_count);
     	System.out.println("employee firstname: "+ employee.getFirstName());
     	System.out.println("employee lastname: "+ employee.getLastName());
     	
@@ -117,6 +135,22 @@ public class EmployeeController {
             return "success";
         } else {
             return "fail";
+        }
+    }
+
+    // Delete a employee
+    @DELETE
+    @Path("delete/{id}")
+    //@Consumes("application/x-www-form-urlencoded")
+    //@Produces(MediaType.APPLICATION_JSON)
+    public String delete(@PathParam("id") long id) throws Exception {
+
+        boolean result = this.deleteEm(id);
+        System.out.println("### delete employee: " +id +" ###");
+        if (result) {
+            return "delete success";
+        } else {
+            return "delete fail";
         }
     }
 }

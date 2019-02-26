@@ -30,13 +30,28 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: employee-rest-service
+  name: employee-rest-service-svc
 spec:
-    type: LoadBalancer
+    type: ClusterIP
     ports:
     - name: http
-      port: 80
+      port: 8081
       targetPort: 8080
       protocol: TCP
     selector:
       run: employee-rest-service
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: employee-rest-service-ing
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /EmployeeRestService
+        backend:
+          serviceName: employee-rest-service-svc
+          servicePort: 8081
