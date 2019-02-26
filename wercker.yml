@@ -4,28 +4,18 @@ box:
 build:
   steps:
     - script:
-        name: install maven
+        name: check
         code: |
-            apk add maven
-            mvn -v
+            pwd
+            ls -l /pipeline/source/
 
-    - script:
-        name: maven build
-        code: mvn clean package 
-
-    - script:
-        name: install tomcat 7
-        code: |
-            wget https://www-eu.apache.org/dist/tomcat/tomcat-7/v7.0.93/bin/apache-tomcat-7.0.93.tar.gz
-            tar -zxf apache-tomcat-7.0.93.tar.gz
-            cd apache-tomcat-7.0.93
-            cp /pipeline/source/target/RestServiceMaven-1.0-SNAPSHOT.war webapps/EmployeeRestService.war
+    - internal/docker-build:
+        dockerfile: Dockerfile
+        image-name: employee-rest-service
 
     - internal/docker-push:
+        image-name: employee-rest-service
         tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
-        ports: "8080"
-        cmd: bin/catalina.sh run
-        working-dir: /pipeline/source/apache-tomcat-7.0.93/
         username: $OKE_USERNAME
         password: $OKE_PASSWORD
         repository: $OKE_REPOSITORY

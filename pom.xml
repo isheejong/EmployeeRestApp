@@ -90,11 +90,4 @@
         <version>2.8.5</version>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>ojdbc6</id>
-      <name>ojdbc6</name>
-      <url>http://www.datanucleus.org:15080/downloads/maven2/</url>
-    </repository>
-  </repositories>
 </project>
