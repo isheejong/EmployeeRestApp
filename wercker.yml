@@ -21,13 +21,6 @@ build:
             cd apache-tomcat-7.0.93
             cp /pipeline/source/target/RestServiceMaven-1.0-SNAPSHOT.war webapps/EmployeeRestService.war
 
-    - script:
-        name: check
-        code: |
-            ls -l /pipeline/source/
-
-push-to-releases:
-  steps:
     - internal/docker-push:
         tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports: "8080"
@@ -44,10 +37,6 @@ deploy-to-oke:
         cmd: /bin/sh
   steps:
     - bash-template
-    
-    - script:
-        name: "Visualise Kubernetes config"
-        code: cat kubernetes-deployment.yml
 
     - kubectl:
         name: delete deplyoment
