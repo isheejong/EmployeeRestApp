@@ -3,12 +3,6 @@ box:
 
 build:
   steps:
-    - script:
-        name: check
-        code: |
-            pwd
-            ls -l /pipeline/source/
-
     - internal/docker-build:
         dockerfile: Dockerfile
         image-name: employee-rest-service
