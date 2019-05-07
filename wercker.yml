@@ -32,7 +32,7 @@ push-to-releases:
         tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
         ports: "8080"
         cmd: bin/catalina.sh run
-        working-dir: /pipeline/source/apache-tomcat-7.0.92/
+        working-dir: /pipeline/source/apache-tomcat-7.0.94/
         username: $OKE_USERNAME
         password: $OKE_PASSWORD
         repository: $OKE_REPOSITORY
