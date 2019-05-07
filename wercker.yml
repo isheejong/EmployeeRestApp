@@ -16,7 +16,7 @@ build:
     - script:
         name: install tomcat 7
         code: |
-            wget https://www-eu.apache.org/dist/tomcat/tomcat-7/v7.0.92/bin/apache-tomcat-7.0.92.tar.gz
+            wget http://apache.mirror.cdnetworks.com/tomcat/tomcat-7/v7.0.94/bin/apache-tomcat-7.0.94.tar.gz
             tar -zxf apache-tomcat-7.0.92.tar.gz
             cd apache-tomcat-7.0.92
             cp /pipeline/source/target/RestServiceMaven-1.0-SNAPSHOT.war webapps/EmployeeRestService.war
